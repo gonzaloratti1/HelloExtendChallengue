@@ -1,48 +1,28 @@
-import { createContext, useContext, useState } from "react";
-
-interface Context {
-  state: {
-    favorites: string[];
-  };
-  actions: {
-    toggleFavorite: (image: string) => void;
-  };
-}
+import create from 'zustand'
 
 interface Props {
-  children: React.ReactNode;
+  favourites: string[]
+  addFavourite: (image: string) => void
 }
 
-const FavoriteContext = createContext({} as Context);
+let value: Props['favourites']
 
-const FavoriteProvider = ({ children }: Props) => {
-  const [favorites, setFavorites] = useState<string[]>([]);
-  
-  function toggleFavorite(image: string) {
-    if (favorites.includes(image)) {
-      setFavorites((favorites) =>
-        favorites.filter((favorite) => favorite !== image)
-      );
-    } else {
-      setFavorites((favorites) => [...favorites, image]);
-    }
-  }
-
-  return (
-    <FavoriteContext.Provider
-      value={{ state: { favorites }, actions: { toggleFavorite } }}
-    >
-      {children}
-    </FavoriteContext.Provider>
-  );
-};
-function useFavorites(): [
-  Context["state"]["favorites"],
-  Context["actions"]["toggleFavorite"]
-] {
-  const { state, actions } = useContext(FavoriteContext);
-
-  return [state.favorites, actions.toggleFavorite];
+if (typeof window !== 'undefined') {
+  value = JSON.parse(window.localStorage.getItem('favourites') || '[]')
 }
 
-export { FavoriteProvider as Provider, useFavorites };
+export const useFavourites = create<Props>((set) => ({
+  favourites: value,
+  addFavourite: (image: string) =>
+    set(({ favourites }) => {
+      const draft = favourites.includes(image)
+        ? favourites.filter((favourite) => favourite !== image)
+        : favourites.concat(image)
+
+      window.localStorage.setItem('favourites', JSON.stringify(draft))
+
+      return {
+        favourites: draft
+      }
+    })
+}))

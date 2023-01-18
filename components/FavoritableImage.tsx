@@ -1,21 +1,22 @@
-"use client"
-import { useFavorites } from "@/state/favorite";
+'use client'
+import Image from 'next/image'
+import { useFavourites } from '@/state/favorite'
 
-const FavoritableImage = ({ src }: { src: string }) => {
-  const [favorites, toggleFavorite] = useFavorites()
-  const isFavorite = favorites.includes(src)
-    return (
-      <div className="relative">
-        <img alt="/" className="w-full h-64 object-cover" src={src} />
-        <button
-          className={`absolute font-bold text-2xl w-8 h-8 bottom-4 right-4 flex items-center justify-center bg-white rounded-full ${isFavorite ? 'text-yellow-500': 'text-black'}`  }
-          style={{ boxShadow: "0 0 0 1px rgba(0,0,0,0.1)" }}
-          onClick={() => toggleFavorite(src)}
-        >
-          {isFavorite ? "★" : "☆"}
-        </button>
-      </div>
-    );
-  };
+export default function FavoritableImage ({ src }: {src: string}) {
+  const favourites = useFavourites((state: { favourites: any }) => state.favourites)
+  const addFavourite = useFavourites((state: { addFavourite: any }) => state.addFavourite)
+  const isFavourite = favourites.includes(src)
 
-export default FavoritableImage
+  return (
+    <div className='relative'>
+      <img className='w-full h-72 object-cover' src={src} alt='Perritos' />
+      <button
+        onClick={() => addFavourite(src)}
+        className='absolute w-8 h-8 bottom-4 right-4 border-none font-bold'
+        style={{ boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.1)' }}
+      >
+        {isFavourite ? '❤️' : '♡'}
+      </button>
+    </div>
+  )
+}

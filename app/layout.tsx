@@ -4,17 +4,22 @@ import { Nunito } from "@next/font/google";
 import Link from "next/link";
 import React, { useState } from "react";
 import FavoritableImage from "@/components/FavoritableImage";
-import { Provider as FavoriteProvider, useFavorites } from "@/state/favorite";
+import { useFavourites } from "@/state/favorite";
+
 
 const nunito = Nunito({ subsets: ["latin"] });
 
-interface Props { children: React.ReactNode}
+interface Props {
+  children: React.ReactNode;
+}
 
-function RootLayout({children}: Props) {
-  const [favorites, setFavorites] = useState<string[]>([]);
+export default function RootLayout ({
+  children
+}: Props) {
+  const favourites = useFavourites((state: { favourites: any; }) => state.favourites)
 
   return (
-    <FavoriteProvider>
+   
       <html className={nunito.className}>
         <head />
         <body className="max-w-screen-md m-auto p-4">
@@ -42,7 +47,7 @@ function RootLayout({children}: Props) {
             <hr />
             <article>
               <h1 className="font-bold text-3xl">Favorites</h1>
-              {favorites.length === 0 ? (
+              {favourites.length === 0 ? (
                 <p>You havent no favorites yet</p>
               ) : (
                 <section
@@ -52,7 +57,7 @@ function RootLayout({children}: Props) {
                   }}
                   className="mt-4 grid gap-4"
                 >
-                  {favorites.map((image) => (
+                  {favourites.map((image: any) => (
                     <FavoritableImage key={image} src={image} />
                   ))}
                 </section>
@@ -61,15 +66,6 @@ function RootLayout({children}: Props) {
           </main>
         </body>
       </html>
-    </FavoriteProvider>
   );
 }
 
-export default function RootLayoutContainer(props: Props){
-  return(
-    <FavoriteProvider>
-      <RootLayout  {...props} />
-    </FavoriteProvider>
-  )
-
-}
